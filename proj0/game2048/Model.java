@@ -64,7 +64,6 @@ public class Model extends Observable {
      * Return the current Tile at (COL, ROW), where 0 <= ROW < size(),
      * 0 <= COL < size(). Returns null if there is no tile there.
      * Used for testing. Should be deprecated and removed.
-     *
      */
     public Tile tile(int col, int row) {
         return board.tile(col, row);
@@ -136,7 +135,6 @@ public class Model extends Observable {
      * 3. When three adjacent tiles in the direction of motion have the same
      * value, then the leading two tiles in the direction of motion merge,
      * and the trailing tile does not.
-     *
      */
     public boolean tilt(Side side) {
         boolean changed;
@@ -145,7 +143,41 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        int size = this.board.size();
+        for(int col = size -1; col >= 0; col--) {
+            int targetRow =  size -1;
+//            int lastMergedRow = -1;
+            for(int row = size -1; row >= 0; row--) {
+                if(targetRow==row) {
+                    continue;
+                }
+                Tile current = tile(col, row);
+                if(current==null){
+                    continue;
+                }else{
+                    Tile targetTile = tile(col, targetRow);
+                    if (targetTile != null) {
+                        if(current.value()==targetTile.value()){
+                            board.move(col,targetRow,current);
+                            targetRow -=1;
+                        } else {
+                            targetRow -= 1; // 无论如何，Row 3 已经被占了，目标移向 Row 2
+                            if (targetRow != row) {
+                                board.move(col, targetRow, current);
+                                changed = true;
+                            }
+                        }
+                    }else{
+                        board.move(col,targetRow,current);
+                    }
 
+
+
+                }
+            }
+
+        }
+        System.out.println(board.toString());
         checkGameOver();
         if (changed) {
             setChanged();
@@ -171,7 +203,6 @@ public class Model extends Observable {
     /**
      * Returns true if at least one space on the Board is empty.
      * Empty spaces are stored as null.
-     *
      */
     public static boolean emptySpaceExists(Board b) {
         int n = b.size();
@@ -224,7 +255,6 @@ public class Model extends Observable {
     }
 
     /**
-     *
      * @param b Board instance
      * @return return two if two adjacent exists
      */
@@ -233,13 +263,22 @@ public class Model extends Observable {
         //check in row
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (b.tile(i, j) != null && j + 1 < size && b.tile(i, j + 1) != null) {
-                    if (b.tile(i, j).value() == b.tile(i, j + 1).value()) {
+
+                Tile current = b.tile(i, j);
+                if (current == null) continue;
+
+                // right
+                if (j + 1 < size) {
+                    Tile right = b.tile(i, j + 1);
+                    if (right != null && current.value() == right.value()) {
                         return true;
                     }
                 }
-                if (b.tile(i, j) != null && i + 1 < size && b.tile(i + 1, j) != null) {
-                    if (b.tile(i, j).value() == b.tile(i + 1, j).value()) {
+
+                // down
+                if (i + 1 < size) {
+                    Tile down = b.tile(i + 1, j);
+                    if (down != null && current.value() == down.value()) {
                         return true;
                     }
                 }
