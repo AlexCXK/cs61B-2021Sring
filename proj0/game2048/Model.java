@@ -166,9 +166,12 @@ public class Model extends Observable {
                         targetRow -=1;
                     } else {
                         targetRow -= 1;
-                        if(board.move(col, targetRow, current)){
+                        if(targetRow != row){
+                            board.move(col, targetRow, current);
                             changed = true;
+
                         }
+
                     }
                 }
             }
