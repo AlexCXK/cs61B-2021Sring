@@ -143,42 +143,38 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        board.setViewingPerspective(side);
         int size = this.board.size();
         for(int col = size -1; col >= 0; col--) {
             int targetRow =  size -1;
-//            int lastMergedRow = -1;
+            int lastMergedRow = -1;
             for(int row = size -1; row >= 0; row--) {
-                if(targetRow==row) {
-                    continue;
-                }
                 Tile current = tile(col, row);
-                if(current==null){
-                    continue;
-                }else{
+                if (current != null && targetRow != row) {
+                    //if targetTile is null, then move
                     Tile targetTile = tile(col, targetRow);
-                    if (targetTile != null) {
-                        if(current.value()==targetTile.value()){
-                            board.move(col,targetRow,current);
-                            targetRow -=1;
-                        } else {
-                            targetRow -= 1; // 无论如何，Row 3 已经被占了，目标移向 Row 2
-                            if (targetRow != row) {
-                                board.move(col, targetRow, current);
-                                changed = true;
-                            }
+                    if (targetTile == null) {
+                        board.move(col, targetRow, current);
+                        changed = true;
+                    } else if (current.value() == targetTile.value() && targetRow != lastMergedRow) {
+                        //merged
+                        if(board.move(col, targetRow, current)){
+                            changed = true;
+                            this.score += current.value() * 2;
                         }
-                    }else{
-                        board.move(col,targetRow,current);
+                        lastMergedRow = targetRow;
+                        targetRow -=1;
+                    } else {
+                        targetRow -= 1;
+                        if(board.move(col, targetRow, current)){
+                            changed = true;
+                        }
                     }
-
-
-
                 }
             }
-
         }
-        System.out.println(board.toString());
         checkGameOver();
+        board.setViewingPerspective(Side.NORTH);
         if (changed) {
             setChanged();
         }
