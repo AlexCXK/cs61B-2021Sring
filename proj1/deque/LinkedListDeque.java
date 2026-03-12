@@ -1,5 +1,7 @@
 package deque;
 
+import java.util.Iterator;
+
 public class LinkedListDeque<T> implements Deque<T> {
     private class Node {
         public T data;
@@ -76,8 +78,10 @@ public class LinkedListDeque<T> implements Deque<T> {
         node.next.prev = this.sentinel;
         node.next =null;
         node.prev = null;
+        T data =node.data;
+        node.data = null;
         this.size -= 1;
-        return node.data;
+        return data;
     }
 
     @Override
@@ -90,8 +94,10 @@ public class LinkedListDeque<T> implements Deque<T> {
         this.sentinel.prev = node.prev;
         node.prev = null;
         node.next = null;
+        T data =node.data;
+        node.data = null;
         this.size -= 1;
-        return node.data;
+        return data;
     }
 
     @Override
@@ -105,5 +111,51 @@ public class LinkedListDeque<T> implements Deque<T> {
             index -= 1;
         }
         return p.data;
+    }
+
+    private class LinkedListDequeIterator implements Iterator<T>{
+        private Node current = sentinel.next;
+
+        @Override
+        public boolean hasNext() {
+            return current != sentinel;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException("no more elements");
+            }
+            T o = current.data;
+            current = current.next;
+            return o;
+        }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new LinkedListDequeIterator();
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if (o == this){return true;}
+        if (o instanceof Deque<?> otherSet){
+            if(this.size != otherSet.size()){
+                return false;
+            }
+            Iterator<T> iterator = this.iterator();
+            Iterator<?> otherIterator = otherSet.iterator();
+            while (iterator.hasNext()){
+                T a = iterator.next();
+                Object b = otherIterator.next();
+                if(!((a == b) || (a != null && a.equals(b)))){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,5 +1,7 @@
 package deque;
 
+import java.util.Iterator;
+
 public class ArrayDeque<T> implements Deque<T>{
     private T[] items;
     private int size;
@@ -40,6 +42,11 @@ public class ArrayDeque<T> implements Deque<T>{
 
     @Override
     public T get(int index) {
+        return null;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
         return null;
     }
 }
