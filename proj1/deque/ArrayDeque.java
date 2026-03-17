@@ -8,6 +8,7 @@ public class ArrayDeque<T> implements Deque<T>{
     private int capacity;
     private int nextFirstIndex;
     private int nextLastIndex;
+//    private int usageFactor;
     public ArrayDeque() {
         capacity = 8;
         items = (T[]) new Object[capacity];
@@ -31,7 +32,7 @@ public class ArrayDeque<T> implements Deque<T>{
             resize();
         }
         items[nextLastIndex] = item;
-        nextLastIndex = (nextFirstIndex + 1 +capacity) %capacity;;
+        nextLastIndex = (nextLastIndex + 1 +capacity) %capacity;
 
     }
 
@@ -52,7 +53,15 @@ public class ArrayDeque<T> implements Deque<T>{
 
     @Override
     public T removeFirst() {
-        return null;
+        int physicalIndex = (nextFirstIndex  + 1 ) % capacity;
+        T item = items[physicalIndex];
+        items[physicalIndex] = null;
+        nextFirstIndex = physicalIndex;
+        if(isLowUsage()){
+            resize();
+        }
+
+        return item;
     }
 
     @Override
@@ -77,5 +86,16 @@ public class ArrayDeque<T> implements Deque<T>{
 
     public  void resize() {
 
+
+    }
+
+    public boolean isLowUsage(){
+        if(this.capacity <16){
+            return false;
+        }
+        if (4 *this.size <this.capacity ){
+            return true;
+        }
+        return false;
     }
 }
